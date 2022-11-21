@@ -1,13 +1,16 @@
+//ALWAYS AT THE START OF THE FILE!!
+import * as dotenv from "dotenv";
+dotenv.config();
+
+import * as path from "path";
 import * as readline from "readline/promises";
 import { stdin, stdout } from "process";
-import { Api, TelegramClient } from "telegram"
+import { TelegramClient } from "telegram"
 import { loadStringSessionIfAvailable, saveSessionKey } from "./session-manager";
-import * as fsp from "fs/promises";
-import {loadChats} from "./chats/load-chats";
+import { loadAndSaveChatsToFile } from "./chats/save-chats";
+import { OUTPUT_DIR, prepareOutputDir } from "./output";
 
-import * as dotenv from "dotenv";
 
-dotenv.config();
 
 if(!process.env.API_ID) {
 	throw new Error("API_ID environment variable not found.");
@@ -19,6 +22,7 @@ if(!process.env.API_HASH) {
 
 const API_ID = parseInt(process.env.API_ID);
 const API_HASH = process.env.API_HASH;
+const MINIFY_JSON = (process.env.MINIFY_JSON ?? "true") === "true" ? true : false;
 
 const bootstrap = async () => {
 	const session = await loadStringSessionIfAvailable();
@@ -41,11 +45,13 @@ const bootstrap = async () => {
 	const sessionKey = (client.session.save() as unknown) as string;
 	await saveSessionKey(sessionKey);
 
-	const chats = await loadChats(client);
+	console.log("Preparing output directory...");
+	await prepareOutputDir();
 
-	console.log("Loaded all chats. Writing to file");
-	await fsp.writeFile("chats.json", JSON.stringify(chats, null, "\t"));
-	console.log("Chats were successfully saved to file");
+	console.log("Loading chats...");
+	const chatsOutputPath = path.resolve(OUTPUT_DIR, "chats.json");
+	await loadAndSaveChatsToFile(client, chatsOutputPath, MINIFY_JSON);
+	console.log("Chats have been successfully saved");
 };
 
 bootstrap();

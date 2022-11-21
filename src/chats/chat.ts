@@ -1,9 +1,25 @@
-import {Api} from "telegram";
-
-
-export interface Chat {
+export interface BasicChat {
 	id: string;
-	type: "dialog" | "channel" | "chat";
-	topMessage: number;
-	source: Api.Chat | Api.User | Api.Channel;
+	archived: boolean;
+	name?: string;
 }
+
+export interface UserChat extends BasicChat {
+	type: "user" | "bot";
+
+	username?: string;
+}
+
+export interface ChannelChat extends BasicChat {
+	type: "channel";
+
+	subsribersCount: number;
+}
+
+export interface GroupChat extends BasicChat {
+	type: "group";
+
+	participantsCount: number;
+}
+
+export type Chat = UserChat | ChannelChat | GroupChat;
