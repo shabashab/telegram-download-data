@@ -39,6 +39,9 @@ const createChatFromDialog = (dialog: Dialog): Chat | undefined => {
 				participantsCount
 			};
 
+			if(group.deactivated)
+				return undefined;
+
 			return groupChat;
 		}
 
@@ -68,7 +71,7 @@ export const loadChats = async (client: TelegramClient) => {
 
 	const interval = setInterval(() => {
 		console.log(`${chats.length} chats loaded`);
-	}, 500);
+	}, 200);
 
 	for await (const dialog of client.iterDialogs()) {
 		const chat = createChatFromDialog(dialog);
