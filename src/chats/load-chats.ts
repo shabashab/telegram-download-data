@@ -64,7 +64,11 @@ const createChatFromDialog = (dialog: Dialog): Chat | undefined => {
 export const loadChats = async (client: TelegramClient) => {
 	const chats: Chat[] = [];
 
-	client.iterMessages
+	console.log("Loading chats...");
+
+	const interval = setInterval(() => {
+		console.log(`${chats.length} chats loaded`);
+	}, 500);
 
 	for await (const dialog of client.iterDialogs()) {
 		const chat = createChatFromDialog(dialog);
@@ -73,6 +77,10 @@ export const loadChats = async (client: TelegramClient) => {
 
 		chats.push(chat);
 	}
+
+	clearInterval(interval);
+
+	console.log(`All the chats (${chats.length}) were successfully loaded.`);
 
 	return chats;
 };

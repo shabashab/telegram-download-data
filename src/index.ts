@@ -48,10 +48,13 @@ const bootstrap = async () => {
 	console.log("Preparing output directory...");
 	await prepareOutputDir();
 
-	console.log("Loading chats...");
 	const chatsOutputPath = path.resolve(OUTPUT_DIR, "chats.json");
 	await loadAndSaveChatsToFile(client, chatsOutputPath, MINIFY_JSON);
-	console.log("Chats have been successfully saved");
+	console.log("Chats have been successfully saved to " + chatsOutputPath);
+
+	return;
 };
 
-bootstrap();
+bootstrap().then(() => {
+	process.exit(0);
+});
